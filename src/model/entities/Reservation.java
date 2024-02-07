@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import model.exception.DomainException;
+
 public class Reservation {
 	//criando as variáveis da classe
 	private Integer roomNumber;
@@ -14,6 +16,9 @@ public class Reservation {
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
    //criação dos construtores com argumentos
 	public Reservation(Integer roomNumber, Date checkIn, Date checkOut) {
+		if(!checkOut.after(checkIn)) {
+			throw new DomainException ("Check-out date must be after check-in date!");
+		}
 		this.roomNumber = roomNumber;
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
@@ -40,8 +45,17 @@ public class Reservation {
 		//método que converte uma unidade de tempo em outra unidade de tempo para fins de cálculo
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
-    //método de atualização do tipo void pois não haverá retorno já que nessa solução as verificações são no programa principal
+    //método de atualização do tipo string, pois após a checagem o programa deve retornar uma string para o programa principal
 	public void updateDates(Date checkIn, Date checkOut) {
+		//nova verificação para confirmar se os dados foram digitados corretamente, feitos na classe auxiliar
+		Date now = new Date();
+		if (checkIn.before(now) || checkOut.before(now)) {
+			throw new DomainException ("Error in reservation: Reservation dates for update must be future dates");
+		}
+		 if (!checkOut.after(checkIn)) {
+			throw new DomainException ("Error in reservation: Check-out date must be after check-in date");
+		 }
+		
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
 	}
